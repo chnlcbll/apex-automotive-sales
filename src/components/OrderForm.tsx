@@ -129,7 +129,7 @@ export function OrderForm({ initialData, onFinish, onCancel }: OrderFormProps) {
               </div>
               <div>
                 <label className={labelClass}>Base Price (₱)</label>
-                <input required type="number" min="0" value={carPrice} onChange={e => setCarPrice(e.target.value)} className={`${inputClass} font-mono`} placeholder="0.00" />
+                <input required type="number" step="any" min="0" value={carPrice} onChange={e => setCarPrice(e.target.value)} className={`${inputClass} font-mono`} placeholder="0.00" />
               </div>
             </div>
           </section>
@@ -143,7 +143,7 @@ export function OrderForm({ initialData, onFinish, onCancel }: OrderFormProps) {
             <div className="mb-8">
               <label className={labelClass}>Overall Discount (%)</label>
               <div className="w-1/2">
-                 <input type="number" min="0" max="100" value={discount} onChange={e => setDiscount(e.target.value)} className={`${inputClass} font-mono`} placeholder="0" />
+                 <input type="number" step="any" min="0" max="100" value={discount} onChange={e => setDiscount(e.target.value)} className={`${inputClass} font-mono`} placeholder="0" />
               </div>
             </div>
 
@@ -162,8 +162,8 @@ export function OrderForm({ initialData, onFinish, onCancel }: OrderFormProps) {
 
               <div className="flex flex-col md:flex-row gap-3">
                 <input type="text" value={newAddOnName} onChange={e => setNewAddOnName(e.target.value)} placeholder="Custom add-on name" className={`${inputClass} flex-1`} />
-                <input type="number" value={newAddOnPrice} onChange={e => setNewAddOnPrice(e.target.value)} placeholder="Price (₱)" className={`${inputClass} md:w-40 font-mono`} />
-                <input type="number" value={newAddOnDiscount} onChange={e => setNewAddOnDiscount(e.target.value)} placeholder="Disc %" className={`${inputClass} md:w-28 font-mono`} />
+                <input type="number" step="any" value={newAddOnPrice} onChange={e => setNewAddOnPrice(e.target.value)} placeholder="Price (₱)" className={`${inputClass} md:w-40 font-mono`} />
+                <input type="number" step="any" value={newAddOnDiscount} onChange={e => setNewAddOnDiscount(e.target.value)} placeholder="Disc %" className={`${inputClass} md:w-28 font-mono`} />
                 <button type="button" onClick={handleAddAddOn} className="bg-zinc-900 text-white rounded-xl px-6 flex items-center justify-center hover:bg-zinc-800 transition-colors">
                   <Plus className="w-5 h-5" />
                 </button>

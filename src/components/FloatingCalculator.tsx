@@ -37,14 +37,14 @@ export function FloatingCalculator() {
               <label className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Total Amount</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-zinc-400 text-sm font-bold">₱</span>
-                <input type="number" value={total} onChange={e => setTotal(e.target.value)} placeholder="0.00" className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-2.5 pl-8 text-zinc-900 text-sm focus:outline-none focus:border-zinc-900 font-mono transition-colors" />
+                <input type="number" step="any" value={total} onChange={e => setTotal(e.target.value)} placeholder="0.00" className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-2.5 pl-8 text-zinc-900 text-sm focus:outline-none focus:border-zinc-900 font-mono transition-colors" />
               </div>
             </div>
             
             <div className="space-y-2">
               <label className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Percentage (%)</label>
               <div className="relative">
-                <input type="number" value={percentage} onChange={e => setPercentage(e.target.value)} placeholder="30" className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-2.5 pr-8 text-zinc-900 text-sm focus:outline-none focus:border-zinc-900 font-mono transition-colors" />
+                <input type="number" step="any" value={percentage} onChange={e => setPercentage(e.target.value)} placeholder="30" className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-2.5 pr-8 text-zinc-900 text-sm focus:outline-none focus:border-zinc-900 font-mono transition-colors" />
                 <span className="absolute right-3 top-2.5 text-zinc-400 text-sm font-bold">%</span>
               </div>
             </div>
