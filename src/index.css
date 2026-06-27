@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+body {
+  background-color: #F7F7F8;
+  color: #09090b;
+}
+
+/* Base custom utilities to smooth out inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

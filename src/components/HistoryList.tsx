@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Order } from '@/types';
 import { formatCurrency, playSound } from '@/lib/utils';
-import { Trash2, Clock, Calendar } from 'lucide-react';
+import { Trash2, ArrowUpRight } from 'lucide-react';
 
 interface HistoryListProps {
   orders: Order[];
@@ -12,23 +12,26 @@ interface HistoryListProps {
 
 export function HistoryList({ orders, onReset, onSelectOrder }: HistoryListProps) {
   return (
-    <div className="w-full max-w-6xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-white">Transaction History</h2>
+    <div className="w-full max-w-7xl mx-auto px-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
+        <div>
+          <h2 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tight mb-2">Order History</h2>
+          <p className="text-zinc-500 font-medium">Review past transactions and vehicle configurations.</p>
+        </div>
         {orders.length > 0 && (
           <button
             onClick={() => { playSound('click'); onReset(); }}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-sm"
           >
             <Trash2 className="w-4 h-4" />
-            Reset History
+            Clear History
           </button>
         )}
       </div>
 
       {orders.length === 0 ? (
-        <div className="text-center py-20 bg-white/5 rounded-3xl border border-white/5 border-dashed">
-          <p className="text-zinc-500 text-xl">No transactions yet.</p>
+        <div className="text-center py-32 bg-white rounded-[2rem] border border-zinc-200 border-dashed">
+          <p className="text-zinc-400 font-bold tracking-widest uppercase text-sm">No recorded transactions.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -39,75 +42,28 @@ export function HistoryList({ orders, onReset, onSelectOrder }: HistoryListProps
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               onClick={() => { playSound('click'); onSelectOrder(order); }}
-              className="group cursor-pointer"
+              className="group bg-white rounded-3xl border border-zinc-200 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all"
             >
-              <div className="relative bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition-all hover:shadow-2xl hover:shadow-cyan-900/10 hover:-translate-y-1">
-                {/* Image Section */}
-                <div className="h-48 w-full overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent z-10" />
-                  <img 
-                    src={order.imageUrl} 
-                    alt={order.carName} 
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <span className="absolute top-4 right-4 z-20 px-2 py-1 rounded bg-black/50 backdrop-blur-md text-xs font-mono text-white border border-white/10">
-                    {order.transactionNumber}
-                  </span>
+              <div className="h-48 relative bg-zinc-100 overflow-hidden">
+                <img 
+                  src={order.imageUrl} 
+                  alt={order.carName} 
+                  className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+
+              <div className="p-6 relative">
+                <div className="absolute -top-6 right-6 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md text-zinc-400 group-hover:text-zinc-900 group-hover:bg-zinc-50 transition-colors">
+                  <ArrowUpRight className="w-5 h-5" />
                 </div>
-
-                {/* Content Section */}
-                <div className="p-6 pt-2">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">
-                        {order.carName}
-                      </h3>
-                      <p className="text-zinc-500 text-sm">{order.yearModel} • {order.color}</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 mb-6">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-zinc-500">Base Price</span>
-                      <span className="text-zinc-300 font-mono">{formatCurrency(order.carPrice)}</span>
-                    </div>
-                    {order.discountPercent > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-zinc-500">Discount ({order.discountPercent}%)</span>
-                        <span className="text-red-400 font-mono">
-                          -{formatCurrency(order.carPrice * (order.discountPercent / 100))}
-                        </span>
-                      </div>
-                    )}
-                    {order.addOns.length > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-zinc-500">Add-ons ({order.addOns.length})</span>
-                        <span className="text-emerald-400 font-mono">
-                          +{formatCurrency(order.addOns.reduce((acc, curr) => {
-                            const discount = curr.discountPercent || 0;
-                            return acc + (curr.price * (1 - discount / 100));
-                          }, 0))}
-                        </span>
-                      </div>
-                    )}
-                    <div className="pt-2 border-t border-white/10 flex justify-between items-center">
-                      <span className="text-zinc-400 font-semibold">Total</span>
-                      <span className="text-xl font-bold text-white font-mono">{formatCurrency(order.totalPrice)}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-xs text-zinc-600">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </div>
-                    {order.pickupDate && (
-                      <div className="flex items-center gap-1 text-orange-500/70">
-                        <Calendar className="w-3 h-3" />
-                        Pickup: {new Date(order.pickupDate).toLocaleDateString()}
-                      </div>
-                    )}
-                  </div>
+                
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">{order.transactionNumber}</span>
+                <h3 className="text-xl font-black text-zinc-900 mt-1 mb-4 truncate tracking-tight">{order.carName}</h3>
+                
+                <div className="flex justify-between items-end pt-4 border-t border-zinc-100">
+                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</span>
+                  <span className="text-lg font-bold text-zinc-900 font-mono">{formatCurrency(order.totalPrice)}</span>
                 </div>
               </div>
             </motion.div>
