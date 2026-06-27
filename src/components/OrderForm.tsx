@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Plus, Trash2, Check, X, Loader2, ArrowRight } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { Order, AddOn } from '@/types';
-import { formatCurrency, playSound, getRandomCarImage } from '@/lib/utils';
+import { formatCurrency, playSound, getFallbackCarImage } from '@/lib/utils';
 import { generateCarImage } from '@/lib/gemini';
 import { FloatingCalculator } from './FloatingCalculator';
 
@@ -81,9 +81,9 @@ export function OrderForm({ initialData, onFinish, onCancel }: OrderFormProps) {
     try {
       const generated = await generateCarImage(carName, color || 'Silver', yearModel || '2024');
       if (generated) finalImageUrl = generated;
-      else if (!finalImageUrl) finalImageUrl = getRandomCarImage();
+      else if (!finalImageUrl) finalImageUrl = getFallbackCarImage(carName);
     } catch (error) {
-      if (!finalImageUrl) finalImageUrl = getRandomCarImage();
+      if (!finalImageUrl) finalImageUrl = getFallbackCarImage(carName);
     }
     
     onFinish({

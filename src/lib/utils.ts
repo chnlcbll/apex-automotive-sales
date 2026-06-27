@@ -66,19 +66,6 @@ export const playSound = (type: 'click' | 'success' | 'hover') => {
   }
 };
 
-export const CAR_IMAGES = [
-  "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=1000&auto=format&fit=crop"
-];
-
-export const getRandomCarImage = () => {
-  return CAR_IMAGES[Math.floor(Math.random() * CAR_IMAGES.length)];
+export const getFallbackCarImage = (carName: string) => {
+  return `https://placehold.co/800x450/18181b/ffffff?text=${encodeURIComponent(carName || 'Vehicle')}&font=inter`;
 };

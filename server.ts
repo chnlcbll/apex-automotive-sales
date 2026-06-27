@@ -49,7 +49,7 @@ app.post("/api/expert", async (req, res) => {
 app.post("/api/generate-image", async (req, res) => {
   try {
     const { carName, color, year } = req.body;
-    const prompt = `A professional studio photograph of a ${year} ${carName} in ${color} color. High-end automotive photography, sleek lighting, 4k resolution.`;
+    const prompt = `A highly accurate, professional studio photograph of a ${year} ${carName} in ${color} color. It MUST exactly be a ${carName}. High-end automotive photography, sleek lighting, photorealistic, 4k resolution. Do not hallucinate a different car brand or model.`;
     
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
