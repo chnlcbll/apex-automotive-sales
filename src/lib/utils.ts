@@ -12,29 +12,14 @@ export const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-// Simple sound effect player
+// Simple sound effect player using Web Audio API
 export const playSound = (type: 'click' | 'success' | 'hover') => {
-  // In a real app we'd load actual audio files. 
-  // For this demo, we'll try to use standard browser beeps or silent fallback if not available,
-  // but since we can't rely on external assets easily without CORS or reliable hosting, 
-  // we will just define the function structure. 
-  // If we really want sound, we can use small base64 data URIs.
-  
-  const sounds = {
-    click: "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU", // Placeholder short blip
-    success: "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU", // Placeholder
-    hover: "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU" // Placeholder
-  };
-  
-  // Real implementation would go here. For now, we'll skip actual audio to avoid annoying noise or broken links
-  // unless specifically requested with valid assets. 
-  // However, the user ASKED for sound effects. 
-  // I will try to synthesize simple sounds using Web Audio API instead of files.
-  
   try {
     const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContext) return;
     
+    // Use a shared context if possible, but for simplicity creating here
+    // In a real app we'd resume a global context on first user interaction
     const ctx = new AudioContext();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -42,29 +27,39 @@ export const playSound = (type: 'click' | 'success' | 'hover') => {
     osc.connect(gain);
     gain.connect(ctx.destination);
     
+    const now = ctx.currentTime;
+    
     if (type === 'click') {
+      // Snappy subtle click
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
     } else if (type === 'success') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(400, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(800, ctx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.3);
-    } else if (type === 'hover') {
+      // Two-tone chime
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(200, ctx.currentTime);
-      gain.gain.setValueAtTime(0.02, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.05);
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+      
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.2, now + 0.02);
+      gain.gain.setValueAtTime(0.2, now + 0.1);
+      gain.gain.linearRampToValueAtTime(0.3, now + 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      
+      osc.start(now);
+      osc.stop(now + 0.4);
+    } else if (type === 'hover') {
+      // Extremely subtle low tap
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, now);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+      osc.start(now);
+      osc.stop(now + 0.03);
     }
   } catch (e) {
     console.error("Audio play failed", e);

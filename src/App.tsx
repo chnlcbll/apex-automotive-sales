@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order, Vehicle } from '@/types';
 import { OrderForm } from '@/components/OrderForm';
@@ -6,13 +6,20 @@ import { HistoryList } from '@/components/HistoryList';
 import { VehicleSearch } from '@/components/VehicleSearch';
 import { StatsView } from '@/components/StatsView';
 import { formatCurrency, playSound } from '@/lib/utils';
-import { Car, History, ShoppingBag, X, Search, Menu } from 'lucide-react';
+import { Car, History, ShoppingBag, X, Search, Menu, Printer } from 'lucide-react';
 
 export default function App() {
   const [view, setView] = useState<'home' | 'buy' | 'history' | 'search' | 'stats'>('home');
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>(() => {
+    const saved = localStorage.getItem('apex_auto_orders');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [draftVehicle, setDraftVehicle] = useState<Partial<Order> | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('apex_auto_orders', JSON.stringify(orders));
+  }, [orders]);
 
   const handleFinishOrder = (order: Order) => {
     setOrders([order, ...orders]);
@@ -36,9 +43,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F7F8] text-zinc-900 font-sans selection:bg-zinc-200">
+    <div className="min-h-screen bg-[#F7F7F8] text-zinc-900 font-sans selection:bg-zinc-200 print:bg-white">
       {/* Sleek Minimal Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 lg:px-12 py-5 flex justify-between items-center bg-white/80 backdrop-blur-xl border-b border-zinc-200/50 transition-all">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 lg:px-12 py-5 flex justify-between items-center bg-white/80 backdrop-blur-xl border-b border-zinc-200/50 transition-all print:hidden">
         <div 
           className="flex items-center gap-3 cursor-pointer group"
           onClick={() => { playSound('click'); setView('home'); }}
@@ -95,8 +102,9 @@ export default function App() {
       </nav>
 
       {/* Main Content Area */}
-      <main className="relative pt-32 pb-24 min-h-screen flex flex-col">
-        <AnimatePresence mode="wait">
+      <main className="relative pt-32 pb-24 min-h-screen flex flex-col print:pt-0 print:pb-0 print:min-h-0 print:block">
+        <div className={selectedOrder ? "print:hidden" : ""}>
+          <AnimatePresence mode="wait">
           {view === 'home' && (
             <motion.div
               key="home"
@@ -184,6 +192,7 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </main>
 
       {/* Modern Order Detail Modal */}
@@ -193,7 +202,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-zinc-900/40 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-zinc-900/40 backdrop-blur-md print:static print:inset-auto print:p-0 print:bg-transparent print:backdrop-blur-none"
             onClick={() => setSelectedOrder(null)}
           >
             <motion.div
@@ -201,23 +210,32 @@ export default function App() {
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 20, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-[2rem] max-w-2xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto flex flex-col"
+              className="bg-white rounded-[2rem] max-w-2xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto flex flex-col print:shadow-none print:w-full print:max-h-none print:max-w-none print:rounded-none"
             >
-              <div className="sticky top-0 z-20 flex justify-between items-center p-6 bg-white/90 backdrop-blur-xl border-b border-zinc-100">
+              <div className="sticky top-0 z-20 flex justify-between items-center p-6 bg-white/90 backdrop-blur-xl border-b border-zinc-100 print:relative print:border-b-2 print:border-zinc-900">
                 <div>
                   <span className="text-zinc-400 font-bold tracking-widest text-[10px] uppercase">Transaction Receipt</span>
                   <p className="font-mono text-sm font-semibold text-zinc-900">#{selectedOrder.transactionNumber}</p>
                 </div>
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="p-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-600 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2 print:hidden">
+                  <button
+                    onClick={() => { playSound('click'); window.print(); }}
+                    className="p-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-full transition-colors flex items-center justify-center gap-2 px-4"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span className="text-sm font-bold">Print</span>
+                  </button>
+                  <button
+                    onClick={() => { playSound('click'); setSelectedOrder(null); }}
+                    className="p-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-600 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
-              <div className="p-8">
-                <div className="w-full h-64 rounded-2xl overflow-hidden mb-8 bg-zinc-100 border border-zinc-200">
+              <div className="p-8 print:p-0 print:pt-8">
+                <div className="w-full h-64 rounded-2xl overflow-hidden mb-8 bg-zinc-100 border border-zinc-200 print:border-none print:h-80">
                   <img 
                     src={selectedOrder.imageUrl} 
                     alt={selectedOrder.carName} 
