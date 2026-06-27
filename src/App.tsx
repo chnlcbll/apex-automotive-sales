@@ -4,11 +4,12 @@ import { Order, Vehicle } from '@/types';
 import { OrderForm } from '@/components/OrderForm';
 import { HistoryList } from '@/components/HistoryList';
 import { VehicleSearch } from '@/components/VehicleSearch';
+import { StatsView } from '@/components/StatsView';
 import { formatCurrency, playSound } from '@/lib/utils';
 import { Car, History, ShoppingBag, X, Search, Menu } from 'lucide-react';
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'buy' | 'history' | 'search'>('home');
+  const [view, setView] = useState<'home' | 'buy' | 'history' | 'search' | 'stats'>('home');
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [draftVehicle, setDraftVehicle] = useState<Partial<Order> | null>(null);
@@ -79,6 +80,16 @@ export default function App() {
             }`}
           >
             Orders
+          </button>
+          <button
+            onClick={() => { playSound('hover'); setView('stats'); }}
+            className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              view === 'stats' 
+                ? 'bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200/50' 
+                : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/50'
+            }`}
+          >
+            Stats
           </button>
         </div>
       </nav>
@@ -164,6 +175,12 @@ export default function App() {
                 onReset={handleResetHistory} 
                 onSelectOrder={setSelectedOrder}
               />
+            </motion.div>
+          )}
+
+          {view === 'stats' && (
+            <motion.div key="stats" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full">
+              <StatsView orders={orders} />
             </motion.div>
           )}
         </AnimatePresence>
