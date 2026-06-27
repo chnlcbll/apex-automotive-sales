@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { GoogleGenAI, Type, ThinkingLevel } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,11 +32,8 @@ app.post("/api/expert", async (req, res) => {
     Which one would you recommend for a premium car shop customer?`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
-      contents: prompt,
-      config: {
-        thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
-      }
+      model: "gemini-2.5-flash",
+      contents: prompt
     });
 
     res.json({ text: response.text || "Unable to generate expert advice at this time." });
@@ -84,6 +81,7 @@ app.post("/api/search", async (req, res) => {
     
     Provide a list of exactly 3 matching vehicles with their estimated market prices in Philippine Pesos (PHP).
     For each vehicle, provide a high-quality image URL that is accurate to the make and model.
+    IMPORTANT: You MUST return the result as a raw JSON array of objects. DO NOT use markdown formatting like \`\`\`json. DO NOT add any conversational text.
     Return the data as a JSON array of objects with the following properties:
     - name: string (Full make and model)
     - price: number (Estimated price in PHP)
@@ -99,31 +97,19 @@ app.post("/api/search", async (req, res) => {
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
-        tools: [{ googleSearch: {} }],
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              name: { type: Type.STRING },
-              price: { type: Type.NUMBER },
-              year: { type: Type.STRING },
-              colors: { type: Type.ARRAY, items: { type: Type.STRING } },
-              description: { type: Type.STRING },
-              imageUrl: { type: Type.STRING },
-              seats: { type: Type.NUMBER },
-              type: { type: Type.STRING },
-              transmission: { type: Type.STRING }
-            },
-            required: ["name", "price", "year", "colors", "imageUrl", "seats", "type", "transmission"]
-          }
-        }
+        tools: [{ googleSearch: {} }]
       }
     });
 
-    const text = response.text;
-    if (!text) return res.json({ vehicles: [] });
+    let text = response.text || "[]";
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    if (!text.startsWith("[")) {
+      text = text.substring(text.indexOf("["));
+    }
+    if (!text.endsWith("]")) {
+      text = text.substring(0, text.lastIndexOf("]") + 1);
+    }
+    
     res.json({ vehicles: JSON.parse(text) });
   } catch (error: any) {
     console.error("Vehicle search failed:", error);
