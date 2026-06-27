@@ -12,7 +12,7 @@ app.use(express.json());
 const PORT = 3000;
 
 // Initialize Gemini
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.AUTO_KEY || process.env.GEMINI_API_KEY });
 
 // API Routes
 app.post("/api/expert", async (req, res) => {
@@ -96,7 +96,7 @@ app.post("/api/search", async (req, res) => {
     - transmission: string (Transmission type like Automatic, Manual, CVT, etc.)`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         tools: [{ googleSearch: {} }],
@@ -125,9 +125,9 @@ app.post("/api/search", async (req, res) => {
     const text = response.text;
     if (!text) return res.json({ vehicles: [] });
     res.json({ vehicles: JSON.parse(text) });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Vehicle search failed:", error);
-    res.status(500).json({ error: "Vehicle search failed." });
+    res.status(500).json({ error: "Vehicle search failed.", details: error?.message || error?.toString() });
   }
 });
 

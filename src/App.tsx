@@ -6,7 +6,7 @@ import { HistoryList } from '@/components/HistoryList';
 import { VehicleSearch } from '@/components/VehicleSearch';
 import { StatsView } from '@/components/StatsView';
 import { formatCurrency, playSound } from '@/lib/utils';
-import { Car, History, ShoppingBag, X, Search, Menu, Printer } from 'lucide-react';
+import { Car, History, ShoppingBag, X, Search, Menu, Printer, Trash } from 'lucide-react';
 
 export default function App() {
   const [view, setView] = useState<'home' | 'buy' | 'history' | 'search' | 'stats'>('home');
@@ -40,6 +40,13 @@ export default function App() {
 
   const handleResetHistory = () => {
     setOrders([]);
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    setOrders(orders.filter(o => o.id !== orderId));
+    if (selectedOrder?.id === orderId) {
+      setSelectedOrder(null);
+    }
   };
 
   return (
@@ -182,6 +189,7 @@ export default function App() {
                 orders={orders} 
                 onReset={handleResetHistory} 
                 onSelectOrder={setSelectedOrder}
+                onDeleteOrder={handleDeleteOrder}
               />
             </motion.div>
           )}
@@ -224,6 +232,17 @@ export default function App() {
                   >
                     <Printer className="w-4 h-4" />
                     <span className="text-sm font-bold">Print</span>
+                  </button>
+                  <button
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      playSound('click'); 
+                      handleDeleteOrder(selectedOrder.id); 
+                    }}
+                    className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-full transition-colors flex items-center justify-center gap-2 px-4"
+                  >
+                    <Trash className="w-4 h-4" />
+                    <span className="text-sm font-bold">Delete</span>
                   </button>
                   <button
                     onClick={() => { playSound('click'); setSelectedOrder(null); }}

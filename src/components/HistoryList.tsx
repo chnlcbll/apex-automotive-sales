@@ -8,9 +8,10 @@ interface HistoryListProps {
   orders: Order[];
   onReset: () => void;
   onSelectOrder: (order: Order) => void;
+  onDeleteOrder: (orderId: string) => void;
 }
 
-export function HistoryList({ orders, onReset, onSelectOrder }: HistoryListProps) {
+export function HistoryList({ orders, onReset, onSelectOrder, onDeleteOrder }: HistoryListProps) {
   return (
     <div className="w-full max-w-7xl mx-auto px-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
@@ -54,7 +55,17 @@ export function HistoryList({ orders, onReset, onSelectOrder }: HistoryListProps
               </div>
 
               <div className="p-6 relative">
-                <div className="absolute -top-6 right-6 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md text-zinc-400 group-hover:text-zinc-900 group-hover:bg-zinc-50 transition-colors">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playSound('click');
+                    onDeleteOrder(order.id);
+                  }}
+                  className="absolute -top-6 right-20 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors z-10"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+                <div className="absolute -top-6 right-6 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md text-zinc-400 group-hover:text-zinc-900 group-hover:bg-zinc-50 transition-colors z-10">
                   <ArrowUpRight className="w-5 h-5" />
                 </div>
                 
